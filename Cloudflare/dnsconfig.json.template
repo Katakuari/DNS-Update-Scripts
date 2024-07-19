@@ -1,0 +1,14 @@
+﻿{
+	"authEmail": "api_mailaddress",
+	"apiToken": "api_token",
+	"recordZoneId": "record_zone_id",
+	"recordType": [
+		"A"
+	],
+	"recordName": [
+		"test.example.com"
+	],
+	"recordId": [
+		"record_id"
+	]
+}
