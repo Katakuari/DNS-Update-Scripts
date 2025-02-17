@@ -1,38 +1,39 @@
 ﻿# 20.07.2024
 # Script by Katakuari - dev@felesadastra.xyz
 
-$dnsconfFile = Get-ChildItem -Path "$PSScriptRoot" -Filter "dnsconfig.json" -Recurse
-$dnsconf = Get-Content $dnsconfFile | ConvertFrom-Json
+$DnsConfigFile = Get-ChildItem -Path "$PSScriptRoot" -Filter "dnsconfig.json" -Recurse
+$DnsConfig = Get-Content $DnsConfigFile | ConvertFrom-Json
 
-$headers = @{
-	"X-Auth-Email"  = "$($dnsconf.authEmail)"; 
-	"Authorization" = "Bearer $($dnsconf.apiToken)";
+$Headers = @{
+	"X-Auth-Email"  = "$($DnsConfig.authEmail)"; 
+	"Authorization" = "Bearer $($DnsConfig.apiToken)";
 	"Content-Type"  = "application/json"
 }
 
-for ($i = 0; $i -lt $dnsconf.recordId.Length; $i++) {
-	Write-Host $i
-	if ($dnsconf.recordType[$i] -eq "A") {
-		$recordValue = (curl.exe https://ifconfig.co/ip -4).Trim()
+# Start logging
+Start-Transcript -UseMinimalHeader -Path "$PSScriptRoot\DnsUpdate.log" -Append
+
+foreach ($Record in $DnsConfig.records) {
+	if ($Record.type -eq "A") {
+		$NewRecordValue = (curl.exe https://ifconfig.co/ip -4 -s).Trim()
 	}
 	
-	if ($dnsconf.recordType[$i] -eq "AAAA") { 
-		$recordValue = (curl.exe https://ifconfig.co/ip -6).Trim()
-		if ($null -eq $recordValue) { break }
+	if ($Record.type -eq "AAAA") { 
+		$NewRecordValue = (curl.exe https://ifconfig.co/ip -6 -s).Trim()
+		if ($null -eq $NewRecordValue) { break }
 	}
 
-	$body = "{
-		""content"": ""$($recordValue)"",
-		""name"": ""$($dnsconf.recordName[$i])"",
-		""type"": ""$($dnsconf.recordType[$i])""
-		}"
+	$Body = @{
+		content = $NewRecordValue
+		name    = $Record.name
+		type    = $Record.type
+	} | ConvertTo-Json
 
-	Write-Host "Updating following entry:`n$body"
+	Write-Host "Updating following entry:`n$Body" -ForegroundColor Yellow
 	
-	$response = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$($dnsconf.recordZoneId)/dns_records/$($dnsconf.recordId[$i])" -Method 'PATCH' -Headers $headers -Body $body
-	$response | ConvertTo-Json
+	$ApiUri = "https://api.cloudflare.com/client/v4/zones/$($DnsConfig.zoneId)/dns_records/$($Record.id)"
+	$Response = Invoke-RestMethod -Uri $ApiUri -Method 'PATCH' -Headers $Headers -Body $Body
+	$Response.result
 }
-<#
-TODO:
-- Logging
-#>
+
+Stop-Transcript
