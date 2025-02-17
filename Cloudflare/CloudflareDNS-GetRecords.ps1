@@ -1,14 +1,14 @@
 ﻿# 19.07.2024
 # Script by Katakuari - dev@felesadastra.xyz
 
-$dnsconf = Get-Content "$PSScriptRoot\dnsconfig.json" | ConvertFrom-Json
+$DnsConfigFile = Get-ChildItem -Path "$PSScriptRoot" -Filter "dnsconfig.json" -Recurse
+$DnsConfig = Get-Content $DnsConfigFile | ConvertFrom-Json
 
-$headers = @{
-	"X-Auth-Email"  = "$($dnsconf.authEmail)"; 
-	"Authorization" = "Bearer $($dnsconf.apiToken)";
+$Headers = @{
+	"X-Auth-Email"  = "$($DnsConfig.authEmail)"
+	"Authorization" = "Bearer $($DnsConfig.apiToken)"
 	"Content-Type"  = "application/json"
 }
 
-$response = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$($dnsconf.recordZoneId)/dns_records" -Method 'GET' -Headers $headers
-$response.result | Where-Object { $_.type -eq "A" -or $_.type -eq "AAAA" } | Format-List id, name, type, content, comment
-
+$Response = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$($DnsConfig.zoneId)/dns_records" -Method "GET" -Headers $Headers
+$Response.result | Where-Object { $_.type -eq "A" -or $_.type -eq "AAAA" } | Format-List id, name, type, content, comment
