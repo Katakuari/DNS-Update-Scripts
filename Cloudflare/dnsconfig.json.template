@@ -1,17 +1,17 @@
 ﻿{
-	"authEmail": "<AUTH MAIL ADDRESS>",
-	"apiToken": "<API TOKEN>",
-	"zoneId": "<ZONE ID>",
-	"records": [
-		{
-			"name": "<RECORD NAME>",
-			"type": "AAAA",
-			"id": "<RECORD ID>"
-		},
-		{
-			"name": "<RECORD NAME>",
-			"type": "A",
-			"id": "<RECORD ID>"
-		}
-	]
+    "authEmail": "<AUTH MAIL ADDRESS>",
+    "apiToken": "<API TOKEN>",
+    "zoneId": "<ZONE ID>",
+    "records": [
+        {
+            "name": "<RECORD NAME>",
+            "type": "AAAA",
+            "id": "<RECORD ID>"
+        },
+        {
+            "name": "<RECORD NAME>",
+            "type": "A",
+            "id": "<RECORD ID>"
+        }
+    ]
 }
