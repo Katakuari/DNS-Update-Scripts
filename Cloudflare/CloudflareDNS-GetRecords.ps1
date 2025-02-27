@@ -5,9 +5,9 @@ $DnsConfigFile = Get-ChildItem -Path "$PSScriptRoot" -Filter "dnsconfig.json" -R
 $DnsConfig = Get-Content $DnsConfigFile | ConvertFrom-Json
 
 $Headers = @{
-	"X-Auth-Email"  = "$($DnsConfig.authEmail)"
-	"Authorization" = "Bearer $($DnsConfig.apiToken)"
-	"Content-Type"  = "application/json"
+    "X-Auth-Email"  = "$($DnsConfig.authEmail)"
+    "Authorization" = "Bearer $($DnsConfig.apiToken)"
+    "Content-Type"  = "application/json"
 }
 
 $Response = Invoke-RestMethod "https://api.cloudflare.com/client/v4/zones/$($DnsConfig.zoneId)/dns_records" -Method "GET" -Headers $Headers
